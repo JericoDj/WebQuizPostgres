@@ -1,44 +1,38 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
+import bodyParser from "body-parser";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const app = express(); // ✅ Moved here before using app
-const port = process.env.PORT || 3000;
-
-// Set EJS and views path
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+const app = express();
+const port = 3000;
 
 let quiz = [
   { country: "France", capital: "Paris" },
   { country: "United Kingdom", capital: "London" },
-  { country: "United States of America", capital: "Washington" },
+  { country: "United States of America", capital: "New York" },
 ];
 
 let totalCorrect = 0;
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
 let currentQuestion = {};
 
 // GET home page
 app.get("/", async (req, res) => {
   totalCorrect = 0;
   await nextQuestion();
+  console.log(currentQuestion);
   res.render("index.ejs", { question: currentQuestion });
 });
 
-// POST form submit
+// POST a new post
 app.post("/submit", (req, res) => {
   let answer = req.body.answer.trim();
   let isCorrect = false;
-
   if (currentQuestion.capital.toLowerCase() === answer.toLowerCase()) {
     totalCorrect++;
+    console.log(totalCorrect);
     isCorrect = true;
   }
 
@@ -52,6 +46,7 @@ app.post("/submit", (req, res) => {
 
 async function nextQuestion() {
   const randomCountry = quiz[Math.floor(Math.random() * quiz.length)];
+
   currentQuestion = randomCountry;
 }
 
