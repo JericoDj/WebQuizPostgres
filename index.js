@@ -5,12 +5,14 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+const app = express(); // ✅ Moved here before using app
 const port = process.env.PORT || 3000;
 
+// Set EJS and views path
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -23,12 +25,14 @@ let quiz = [
 let totalCorrect = 0;
 let currentQuestion = {};
 
+// GET home page
 app.get("/", async (req, res) => {
   totalCorrect = 0;
   await nextQuestion();
   res.render("index.ejs", { question: currentQuestion });
 });
 
+// POST form submit
 app.post("/submit", (req, res) => {
   let answer = req.body.answer.trim();
   let isCorrect = false;
